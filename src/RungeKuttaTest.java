@@ -1,48 +1,127 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.util.concurrent.Callable;
 
 public class RungeKuttaTest {
 	
 		public final static double H = 0.01;
+		public static final double A = .4;
+		public static final double B = .01;
+		public static final double C = .3;
+		public static final double D = .005;
+		public static final double E = .01;
+		public static final double F = .3;
+		public static final double G = .005;
 
 		public static void main(String[] args) throws FileNotFoundException {
 			double yn = 100;
 			double xn = 100;
-			PrintStream output = new PrintStream(new File("results.csv"));
-			for (int i = 0; i < 10000; i++) {
+			double zn = 100;
 			
-				double ky1 = getK('y', yn, xn, 0, 0);
-				double kx1 = getK('x', yn, xn, 0, 0);
-				double ky2 = getK('y', yn, xn, ky1, kx1);
-				double kx2 = getK('x', yn, xn, ky1, kx1);
-				double ky3 = getK('y', yn, xn, ky2, kx2);
-				double kx3 = getK('x', yn, xn, ky2, kx2);
-				double ky4 = getK('y', yn, xn, ky3, kx3);
-				double kx4 = getK('x', yn, xn, ky3, kx3);
-	
-				double yn1 = yn + (H/6) * (ky1+2*ky2+2*ky3+ky4);
-				double xn1 = xn + (H/6) * (kx1+2*kx2+2*kx3+kx4);
+			PrintStream output = new PrintStream(new File("results.csv"));
+			for (int steps = 0; steps < 10000; steps++) {
+				
+				double kx1 = getSuperK('x', xn, yn, zn, 0, 0, 0);
+				double ky1 = getSuperK('y', xn, yn, zn, 0, 0, 0);
+				double kz1 = getSuperK('z', xn, yn, zn, 0, 0, 0);
+				
+				double kx2 = getSuperK('x', xn, yn, zn, kx1, ky1, kz1);
+				double ky2 = getSuperK('y', xn, yn, zn, kx1, ky1, kz1);
+				double kz2 = getSuperK('z', xn, yn, zn, kx1, ky1, kz1);
+				
+				double kx3 = getSuperK('x', xn, yn, zn, kx2, ky2, kz2);
+				double ky3 = getSuperK('y', xn, yn, zn, kx2, ky2, kz2);
+				double kz3 = getSuperK('z', xn, yn, zn, kx2, ky2, kz2);
+				
+				double kx4 = getSuperK('x', xn, yn, zn, kx3, ky3, kz3);
+				double ky4 = getSuperK('y', xn, yn, zn, kx3, ky3, kz3);
+				double kz4 = getSuperK('z', xn, yn, zn, kx3, ky3, kz3);
+				
+				double xn1 = xn + (H / 6) * (kx1 + 2 * kx2 + 2 * kx3 + kx4);
+				double yn1 = yn + (H / 6) * (ky1 + 2 * ky2 + 2 * ky3 + ky4);
+				double zn1 = zn + (H / 6) * (kz1 + 2 * kz2 + 2 * kz3 + kz4);
+				
+				
+				if(yn1 < 0) {
+					yn1 = 0;
+				}
+				if(zn1 < 0) {
+					zn1 = 0;
+				}
+				if(xn1 < 0) {
+					xn1 = 0;
+				}
 				
 				yn = yn1;
 				xn = xn1;
-				output.println(yn +"," + xn1);
+				zn = zn1;
+				output.println(xn + "," + yn + "," + zn);
+				
+				
+				/*
+				double kx1 = getK('x', xn, yn, 0, 0);
+				double ky1 = getK('y', xn, yn, 0, 0);
+				
+				double kx2 = getK('x', xn, yn, kx1, ky1);
+				double ky2 = getK('y', xn, yn, kx1, ky1);
+				
+				double kx3 = getK('x', xn, yn, kx2, ky2);
+				double ky3 = getK('y', xn, yn, kx2, ky2);
+				
+				double kx4 = getK('x', xn, yn, kx3, ky3);
+				double ky4 = getK('y', xn, yn, kx3, ky3);
+				
+				double xn1 = xn + (H / 6) * (kx1 + 2 * kx2 + 2 * kx3 + kx4);
+				double yn1 = yn + (H / 6) * (ky1 + 2 * ky2 + 2 * ky3 + ky4);
+				
+				yn = yn1;
+				xn = xn1;
+				
+				output.println(xn + "," + yn);
+				*/
 			}
 		}
 		
-		public static double getK(char var, double yn, double xn, double ky, double kx) {
+		public static double getSuperK(char var, double xn, double yn, double zn, double kx, double ky, double kz) {
 			if (var == 'y') {
-				return dy(yn + (H/2) * ky, xn + (H/2.0) * ky);
+				return dy(xn + (H/2.0) * ky, yn + (H/2.0) * ky, zn + (H/2.0) * kz);
+			} else if(var == 'x'){
+				return dx(xn + (H/2.0) * ky, yn + (H/2.0) * ky, zn + (H/2.0) * kz);
 			} else {
-				return dx(yn + (H/2) * ky, xn + (H/2.0) * ky);
+				return dz(xn + (H/2.0) * ky, yn + (H/2.0) * ky, zn + (H/2.0) * kz);
+			}
+		}
+		
+		// Gets K for basic predator prey
+		public static double getK(char var, double xn, double yn, double kx, double ky) {
+			if (var == 'y') {
+				return dy(yn + (H/2.0) * ky, xn + (H/2.0) * kx);
+			} else {
+				return dx(yn + (H/2.0) * ky, xn + (H/2.0) * kx);
 			}
 		}
 
 		public static double dy (double y, double x) {
-			return (0.4-0.01*x)*y;
+			//return (0.4-0.01*x)*y;
+			return (A-B*x)*y;
+			//return C*x*y - D*y;
 		}
+		
 		public static double dx (double y, double x) {
-			return (0.005*y-0.3)*x;
+			//return (0.005*y-0.3)*x;
+			//return (D*y -C)*x;
+			return -(C*x - D*x*y);
+		}
+		
+		public static double dx(double x, double y, double z) {
+			return A*x - B*x*y;
+		}
+		
+		public static double dy(double x, double y, double z) {
+			return -C*y + D*x*y - E*y*z;
+		}
+		
+		public static double dz(double x, double y, double z) {
+			return -F*z + G*y*z;
 		}
 }

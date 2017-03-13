@@ -1,4 +1,5 @@
 public class Nature {
+   public static final double H = 1000;
    
    public static void main(String[] args) {
       double[] beingConsumed = {0.0, .01};// length of species considered
@@ -31,10 +32,20 @@ public class Nature {
          double deathRate = current.trueDeathRate * current.population;
          
          current.population = current.population + ((birthRate + growthSum - consumedSum - deathRate) / 1000.0);
-         //
-         //current.population = current.populat;
+         
          System.out.println(current + " " + current.population);
+         }
       }
    }
-}
+   
+   
+   
+   public static double calculateK(double yn, double k, double constant) {
+	   return yn + constant * H * k;
+   }
+   
+   
+   public static double calculateNextStep(double yn, double k1, double k2, double k3, double k4) {
+	   return yn + ((double) H/6.0) * (k1 + 2 * k2 + 2 * k3 + k4);
+   }
 }

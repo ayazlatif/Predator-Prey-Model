@@ -13,20 +13,22 @@ import java.io.PrintStream;
 public class RungeKuttaTest {
 	
 		public final static double H = 0.01;
-		public static final double A = .4;
-		public static final double B = .01;
-		public static final double C = .3;
-		public static final double D = .005;
-		public static final double E = .01;
-		public static final double F = .3;
-		public static final double G = .005;
+		public static final double A = 1;
+		public static final double B = 1;
+		public static final double C = .99;
+		public static final double D = .98;
+		public static final double E = 1;
+		public static final double F = .97;
+		public static final double G = .96;
 
 		public static void main(String[] args) throws FileNotFoundException {
-			double yn = 100;
-			double xn = 100;
-			double zn = 100;
+			double yn = 100;//A/B;
+			double xn = 100;//(((F*C)/E) - ((G*A*C)/(B*E))) / (((F*D)/E) - ((G*A*D)/(B*E)));
+			double zn = 100;//((D*xn)/E) - (C/E);
 			
-			PrintStream output = new PrintStream(new File("results.csv"));
+			System.out.println(xn + " " + yn + " " + zn);
+			
+			PrintStream output = new PrintStream(new File("curiousity.csv"));
 			for (int steps = 0; steps < 10000; steps++) {
 				
 				double kx1 = getK('x', xn, yn, zn, 0, 0, 0);

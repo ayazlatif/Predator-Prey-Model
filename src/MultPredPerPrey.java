@@ -12,20 +12,21 @@ import java.io.PrintStream;
 public class MultPredPerPrey {
 	
 		public final static double H = 0.01;
-		public static final double A = .4;
-		public static final double B = .01;
-		public static final double C = .3;
-		public static final double D = .005;
-		public static final double E = .01;
-		public static final double F = .3;
-		public static final double G = .005;
+		public static final double A = 1;
+		public static final double B = 1;
+		public static final double C = .9;
+		public static final double D = .9;
+		public static final double E = 1;
+		public static final double F = 1.8;
+		public static final double G = 1.8;
 
 		public static void main(String[] args) throws FileNotFoundException {
-			double yn = 100;
-			double xn = 100;
-			double zn = 100;
+			double yn = 1;
+			double xn = 1;
+			double zn = 1;
 			
-			PrintStream output = new PrintStream(new File("results2.csv"));
+			PrintStream output = new PrintStream(new File("multpredperprey coexist.csv"));
+			output.println("Species X, Species Y, Species Z");
 			for (int steps = 0; steps < 10000; steps++) {
 				
 				double kx1 = getK('x', xn, yn, zn, 0, 0, 0);
@@ -49,19 +50,27 @@ public class MultPredPerPrey {
 				double zn1 = zn + (H / 6) * (kz1 + 2 * kz2 + 2 * kz3 + kz4);
 				
 				
-				if(yn1 < 0) {
-					yn1 = 0;
-				}
-				if(zn1 < 0) {
-					zn1 = 0;
-				}
-				if(xn1 < 0) {
-					xn1 = 0;
+				if(yn1 <= 0 || yn <= 0) {
+					yn = 0;
+				} else {
+					yn = yn1;
 				}
 				
-				yn = yn1;
-				xn = xn1;
-				zn = zn1;
+				if(zn1 <= 0 || zn <= 0) {
+					zn = 0;
+				} else {
+					zn = zn1;
+				}
+				
+				if(xn1 <= 0 || xn <= 0) {
+					xn = 0;
+				} else {
+					xn = xn1;
+				}
+				
+				
+				
+				
 				output.println(xn + "," + yn + "," + zn);
 				
 				
